@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  router:
+    build:
+      context: ./router
+    container_name: router
+    ports:
+      - "8080:8080"
+    depends_on:
+      - cpp_compiler
+      - c_compiler
+      - java_compiler
+      - python_compiler
+    networks:
+      - compiler_network
+
+  cpp_compiler:
+    build:
+      context: ./languages/cpp_compiler
+    container_name: cpp_compiler
+    networks:
+      - compiler_network
+
+  c_compiler:
+    build:
+      context: ./languages/c_compiler
+    container_name: c_compiler
+    networks:
+      - compiler_network
+
+  java_compiler:
+    build:
+      context: ./languages/java_compiler
+    container_name: java_compiler
+    networks:
+      - compiler_network
+
+  python_compiler:
+    build:
+      context: ./languages/python_compiler
+    container_name: python_compiler
+    networks:
+      - compiler_network
+
+networks:
+  compiler_network:
+    driver: bridge

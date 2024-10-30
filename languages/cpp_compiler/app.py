@@ -1,16 +1,18 @@
 from flask import Flask, request, jsonify
 import subprocess
 import os
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # Allow CORS for all routes
 
 @app.route('/compile', methods=['POST'])
 def compile_code():
     data = request.get_json()
-    code = data.get('code')
-    testcases = data.get('testcases', [])
+    code = data['code']
+    testcases = data['testcases']
 
-    # Save the user's code to a file
+    # Save the C++ code to main.cpp
     with open('main.cpp', 'w') as f:
         f.write(code)
 
@@ -18,23 +20,17 @@ def compile_code():
     compile_result = subprocess.run(['g++', 'main.cpp', '-o', 'main'], capture_output=True, text=True)
     
     if compile_result.returncode != 0:
-        # Compilation error
         return jsonify({'error': compile_result.stderr}), 400
 
-    # Run the compiled program for each testcase and capture the output
     results = []
     for testcase in testcases:
-        input_data = testcase['input']
-        
-        # Run the compiled C++ program with the provided input
         try:
-            process = subprocess.run(['./main'], input=input_data, capture_output=True, text=True, timeout=5)
-            actual_output = process.stdout.strip()  # Strip to ensure exact match
-            expected_output = testcase['output'].strip()  # Strip expected output
-
-            # Append results preserving formatting
+            process = subprocess.run(['./main'], input=testcase['input'], capture_output=True, text=True, timeout=5)
+            actual_output = process.stdout.strip()
+            expected_output = testcase['output'].strip()
+            
             results.append({
-                'input': input_data,
+                'input': testcase['input'],
                 'expected_output': expected_output,
                 'actual_output': actual_output,
                 'success': actual_output == expected_output
@@ -42,16 +38,16 @@ def compile_code():
         
         except subprocess.TimeoutExpired:
             results.append({
-                'input': input_data,
+                'input': testcase['input'],
                 'error': 'Execution timed out',
                 'success': False
             })
 
-    # Clean up the compiled binary and source file
-    if os.path.exists('./main'):
-        os.remove('./main')
-    if os.path.exists('./main.cpp'):
-        os.remove('./main.cpp')
+    # Clean up compiled binary and source files
+    if os.path.exists('main'):
+        os.remove('main')
+    if os.path.exists('main.cpp'):
+        os.remove('main.cpp')
 
     return jsonify(results)
 
@@ -61,8 +57,9 @@ if __name__ == '__main__':
 # from flask import Flask, request, jsonify
 # import subprocess
 # import os
-
+# from flask_cors import CORS
 # app = Flask(__name__)
+# CORS(app)  # Allow CORS for all routes
 
 # @app.route('/compile', methods=['POST'])
 # def compile_code():
@@ -89,14 +86,15 @@ if __name__ == '__main__':
 #         # Run the compiled C++ program with the provided input
 #         try:
 #             process = subprocess.run(['./main'], input=input_data, capture_output=True, text=True, timeout=5)
-#             actual_output = process.stdout
-            
+#             actual_output = process.stdout.strip()  # Strip to ensure exact match
+#             expected_output = testcase['output'].strip()  # Strip expected output
+
 #             # Append results preserving formatting
 #             results.append({
 #                 'input': input_data,
-#                 'expected_output': testcase['output'],
+#                 'expected_output': expected_output,
 #                 'actual_output': actual_output,
-#                 'success': actual_output.strip() == testcase['output'].strip()
+#                 'success': actual_output == expected_output
 #             })
         
 #         except subprocess.TimeoutExpired:
@@ -106,7 +104,7 @@ if __name__ == '__main__':
 #                 'success': False
 #             })
 
-#     # Clean up the compiled binary
+#     # Clean up the compiled binary and source file
 #     if os.path.exists('./main'):
 #         os.remove('./main')
 #     if os.path.exists('./main.cpp'):
@@ -116,37 +114,3 @@ if __name__ == '__main__':
 
 # if __name__ == '__main__':
 #     app.run(host='0.0.0.0', port=8080)
-
-# # from flask import Flask, request, jsonify
-# # import subprocess
-
-# # app = Flask(__name__)
-
-# # @app.route('/compile', methods=['POST'])
-# # def compile_code():
-# #     data = request.get_json()
-# #     code = data['code']
-# #     testcases = data['testcases']
-    
-# #     with open('main.cpp', 'w') as f:
-# #         f.write(code)
-    
-# #     compile_result = subprocess.run(['g++', 'main.cpp', '-o', 'main'], capture_output=True, text=True)
-    
-# #     if compile_result.returncode != 0:
-# #         return jsonify({'error': compile_result.stderr}), 400
-
-# #     results = []
-# #     for testcase in testcases:
-# #         process = subprocess.run(['./main'], input=testcase['input'], capture_output=True, text=True)
-# #         results.append({
-# #             'input': testcase['input'],
-# #             'expected_output': testcase['output'],
-# #             'actual_output': process.stdout.strip(),
-# #             'success': process.stdout.strip() == testcase['output']
-# #         })
-
-# #     return jsonify(results)
-
-# # if __name__ == '__main__':
-# #     app.run(host='0.0.0.0', port=8080)

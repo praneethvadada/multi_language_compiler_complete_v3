@@ -4,52 +4,51 @@ services:
   cpp_compiler:
     build:
       context: ./languages/cpp_compiler
-    container_name: cpp_compiler
-    ports:
-      - "8081:8080" # Exposing port 8081 on the host to access the C++ compiler service
     networks:
       - compiler_network
+    deploy:
+      replicas: 2
 
   c_compiler:
     build:
       context: ./languages/c_compiler
-    container_name: c_compiler
-    ports:
-      - "8082:8080" # Exposing port 8082 on the host to access the C compiler service
     networks:
       - compiler_network
+    deploy:
+      replicas: 2
 
   java_compiler:
     build:
       context: ./languages/java_compiler
-    container_name: java_compiler
     ports:
-      - "8083:8080" # Exposing port 8083 on the host to access the Java compiler service
+      - "8083:8080" # Expose container port 8080 to host port 8083
     networks:
       - compiler_network
+    deploy:
+      replicas: 3
+
 
   python_compiler:
     build:
       context: ./languages/python_compiler
-    container_name: python_compiler
-    ports:
-      - "8084:8080" # Exposing port 8084 on the host to access the Python compiler service
     networks:
       - compiler_network
+    deploy:
+      replicas: 3
 
 networks:
   compiler_network:
     driver: bridge
 
 # version: '3.8'
+
 # services:
-#   # Remove the router service since it's not needed for direct access
 #   cpp_compiler:
 #     build:
 #       context: ./languages/cpp_compiler
 #     container_name: cpp_compiler
 #     ports:
-#       - "8081:8080"  # Expose internal port 8080 as 8081 on host
+#       - "8081:8080" # Exposing port 8081 on the host to access the C++ compiler service
 #     networks:
 #       - compiler_network
 
@@ -58,7 +57,7 @@ networks:
 #       context: ./languages/c_compiler
 #     container_name: c_compiler
 #     ports:
-#       - "8082:8080"  # Expose internal port 8080 as 8082 on host
+#       - "8082:8080" # Exposing port 8082 on the host to access the C compiler service
 #     networks:
 #       - compiler_network
 
@@ -67,7 +66,7 @@ networks:
 #       context: ./languages/java_compiler
 #     container_name: java_compiler
 #     ports:
-#       - "8083:8080"  # Expose internal port 8080 as 8083 on host
+#       - "8083:8080" # Exposing port 8083 on the host to access the Java compiler service
 #     networks:
 #       - compiler_network
 
@@ -76,7 +75,7 @@ networks:
 #       context: ./languages/python_compiler
 #     container_name: python_compiler
 #     ports:
-#       - "8084:8080"  # Expose internal port 8080 as 8084 on host
+#       - "8084:8080" # Exposing port 8084 on the host to access the Python compiler service
 #     networks:
 #       - compiler_network
 
@@ -86,24 +85,13 @@ networks:
 
 # # version: '3.8'
 # # services:
-# #   router:
-# #     build:
-# #       context: ./router
-# #     container_name: router
-# #     ports:
-# #       - "8080:8080"
-# #     depends_on:
-# #       - cpp_compiler
-# #       - c_compiler
-# #       - java_compiler
-# #       - python_compiler
-# #     networks:
-# #       - compiler_network
-
+# #   # Remove the router service since it's not needed for direct access
 # #   cpp_compiler:
 # #     build:
 # #       context: ./languages/cpp_compiler
 # #     container_name: cpp_compiler
+# #     ports:
+# #       - "8081:8080"  # Expose internal port 8080 as 8081 on host
 # #     networks:
 # #       - compiler_network
 
@@ -111,6 +99,8 @@ networks:
 # #     build:
 # #       context: ./languages/c_compiler
 # #     container_name: c_compiler
+# #     ports:
+# #       - "8082:8080"  # Expose internal port 8080 as 8082 on host
 # #     networks:
 # #       - compiler_network
 
@@ -118,6 +108,8 @@ networks:
 # #     build:
 # #       context: ./languages/java_compiler
 # #     container_name: java_compiler
+# #     ports:
+# #       - "8083:8080"  # Expose internal port 8080 as 8083 on host
 # #     networks:
 # #       - compiler_network
 
@@ -125,9 +117,59 @@ networks:
 # #     build:
 # #       context: ./languages/python_compiler
 # #     container_name: python_compiler
+# #     ports:
+# #       - "8084:8080"  # Expose internal port 8080 as 8084 on host
 # #     networks:
 # #       - compiler_network
 
 # # networks:
 # #   compiler_network:
 # #     driver: bridge
+
+# # # version: '3.8'
+# # # services:
+# # #   router:
+# # #     build:
+# # #       context: ./router
+# # #     container_name: router
+# # #     ports:
+# # #       - "8080:8080"
+# # #     depends_on:
+# # #       - cpp_compiler
+# # #       - c_compiler
+# # #       - java_compiler
+# # #       - python_compiler
+# # #     networks:
+# # #       - compiler_network
+
+# # #   cpp_compiler:
+# # #     build:
+# # #       context: ./languages/cpp_compiler
+# # #     container_name: cpp_compiler
+# # #     networks:
+# # #       - compiler_network
+
+# # #   c_compiler:
+# # #     build:
+# # #       context: ./languages/c_compiler
+# # #     container_name: c_compiler
+# # #     networks:
+# # #       - compiler_network
+
+# # #   java_compiler:
+# # #     build:
+# # #       context: ./languages/java_compiler
+# # #     container_name: java_compiler
+# # #     networks:
+# # #       - compiler_network
+
+# # #   python_compiler:
+# # #     build:
+# # #       context: ./languages/python_compiler
+# # #     container_name: python_compiler
+# # #     networks:
+# # #       - compiler_network
+
+# # # networks:
+# # #   compiler_network:
+# # #     driver: bridge
